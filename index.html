@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ポケモンクイズ</title>
+    <style>
+        img {
+            max-width: 300px;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ポケモンクイズ</h1>
+    <div>
+        <img id="pokemon-image" src="">
+        <p>ポケモンの名前を入力してください</p>
+        <input type="text" id="answer-input">
+        <button id="answer-button">回答する</button>
+        <button id="hint-button">答えを見る</button>
+        <button id="next-button" style="display: none;">次の問題に進む</button>
+        <p id="result"></p>
+        <p id="consecutive-count">連続正解数: 0</p>
+    </div>
+
+    <script>
+        // 3つのポケモンの画像を配列に格納
+        const pokemonImages = [
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/15.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/20.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/21.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/27.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/28.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/30.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/31.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/32.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/33.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/34.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/35.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/36.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/38.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/40.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/41.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/42.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/44.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/46.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/47.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/48.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/49.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/50.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/56.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/62.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/64.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/66.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/70.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/72.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/73.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/75.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/76.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/79.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/81.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/82.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/83.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/84.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/85.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/88.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/89.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/96.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/97.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/98.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/99.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/100.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/101.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/102.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/103.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/105.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/106.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/107.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/108.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/109.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/111.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/112.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/114.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/115.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/116.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/117.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/118.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/119.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/122.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/123.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/125.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/126.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/127.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/128.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/135.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/137.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/138.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/139.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/140.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/141.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/144.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/145.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/146.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/147.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png',
+'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png'
+        ];
+
+        let consecutiveCount = 0; // 連続正解数を記録する変数
+
+        // ランダムに1つのポケモンを選択
+        let randomIndex = Math.floor(Math.random() * pokemonImages.length);
+        let pokemonName = getPokemonName(randomIndex);
+
+        // 画像を表示
+        const pokemonImage = document.getElementById('pokemon-image');
+        pokemonImage.src = pokemonImages[randomIndex];
+
+// 回答ボタンをクリックしたときの処理
+const answerButton = document.getElementById('answer-button');
+answerButton.addEventListener('click', () => {
+    const answerInput = document.getElementById('answer-input');
+    const answer = answerInput.value.toLowerCase();
+    if (answer === pokemonName.toLowerCase()) {
+        document.getElementById('result').textContent = '正解！';
+        consecutiveCount++;
+        document.getElementById('consecutive-count').textContent = '連続正解数: ' + consecutiveCount;
+        document.getElementById('answer-input').disabled = true; // 回答入力を無効化
+        document.getElementById('answer-button').disabled = true; // 回答ボタンを無効化
+        document.getElementById('hint-button').style.display = 'none'; // ヒントボタンを非表示
+        document.getElementById('next-button').style.display = 'inline-block'; // 「次の問題」を表示
+    } else {
+        document.getElementById('result').textContent = '不正解';
+        consecutiveCount = 0; // 連続正解数をリセット
+        document.getElementById('consecutive-count').textContent = '連続正解数: ' + consecutiveCount;
+    }
+});
+
+
+        // ヒントボタンをクリックしたときの処理
+        const hintButton = document.getElementById('hint-button');
+        hintButton.addEventListener('click', () => {
+            consecutiveCount = 0; // 連続正解数をリセット
+            document.getElementById('consecutive-count').textContent = '連続正解数: ' + consecutiveCount;
+            alert("このポケモンは" + pokemonName + "です");
+            document.getElementById('answer-button').style.display = 'none'; // 「回答する」を非表示
+            document.getElementById('hint-button').style.display = 'none'; // ヒントボタンを非表示
+            document.getElementById('next-button').style.display = 'inline-block'; // 「次の問題」を表示
+        });
+
+        // 次の問題ボタンをクリックしたときの処理
+        const nextButton = document.getElementById('next-button');
+        nextButton.addEventListener('click', () => {
+            resetQuiz();
+        });
+
+        // 選択したポケモンの名前を取得する関数
+        function getPokemonName(index) {
+            switch (index) {
+case 0:
+return 'フシギダネ';
+case 1:
+return 'フシギソウ';
+case 2:
+return 'フシギバナ';
+case 3:
+return 'ヒトカゲ';
+case 4:
+return 'リザード';
+case 5:
+return 'リザードン';
+case 6:
+return 'ゼニガメ';
+case 7:
+return 'カメール';
+case 8:
+return 'カメックス';
+case 9:
+return 'キャタピー';
+case 10:
+return 'トランセル';
+case 11:
+return 'バタフリー';
+case 12:
+return 'ビードル';
+case 13:
+return 'コクーン';
+case 14:
+return 'スピアー';
+case 15:
+return 'ポッポ';
+case 16:
+return 'ピジョン';
+case 17:
+return 'ピジョット';
+case 18:
+return 'コラッタ';
+case 19:
+return 'ラッタ';
+case 20:
+return 'オニスズメ';
+case 21:
+return 'オニドリル';
+case 22:
+return 'アーボ';
+case 23:
+return 'アーボック';
+case 24:
+return 'ピカチュウ';
+case 25:
+return 'ライチュウ';
+case 26:
+return 'サンド';
+case 27:
+return 'サンドパン';
+case 28:
+return 'ニドラン♀';
+case 29:
+return 'ニドリーナ';
+case 30:
+return 'ニドクイン';
+case 31:
+return 'ニドラン♂';
+case 32:
+return 'ニドリーノ';
+case 33:
+return 'ニドキング';
+case 34:
+return 'ピッピ';
+case 35:
+return 'ピクシー';
+case 36:
+return 'ロコン';
+case 37:
+return 'キュウコン';
+case 38:
+return 'プリン';
+case 39:
+return 'プクリン';
+case 40:
+return 'ズバット';
+case 41:
+return 'ゴルバット';
+case 42:
+return 'ナゾノクサ';
+case 43:
+return 'クサイハナ';
+case 44:
+return 'ラフレシア';
+case 45:
+return 'パラス';
+case 46:
+return 'パラセクト';
+case 47:
+return 'コンパン';
+case 48:
+return 'モルフォン';
+case 49:
+return 'ディグダ';
+case 50:
+return 'ダグトリオ';
+case 51:
+return 'ニャース';
+case 52:
+return 'ペルシアン';
+case 53:
+return 'コダック';
+case 54:
+return 'ゴルダック';
+case 55:
+return 'マンキー';
+case 56:
+return 'オコリザル';
+case 57:
+return 'ガーディ';
+case 58:
+return 'ウインディ';
+case 59:
+return 'ニョロモ';
+case 60:
+return 'ニョロゾ';
+case 61:
+return 'ニョロボン';
+case 62:
+return 'ケーシィ';
+case 63:
+return 'ユンゲラー';
+case 64:
+return 'フーディン';
+case 65:
+return 'ワンリキー';
+case 66:
+return 'ゴーリキー';
+case 67:
+return 'カイリキー';
+case 68:
+return 'マダツボミ';
+case 69:
+return 'ウツドン';
+case 70:
+return 'ウツボット';
+case 71:
+return 'メノクラゲ';
+case 72:
+return 'ドククラゲ';
+case 73:
+return 'イシツブテ';
+case 74:
+return 'ゴローン';
+case 75:
+return 'ゴローニャ';
+case 76:
+return 'ポニータ';
+case 77:
+return 'ギャロップ';
+case 78:
+return 'ヤドン';
+case 79:
+return 'ヤドラン';
+case 80:
+return 'コイル';
+case 81:
+return 'レアコイル';
+case 82:
+return 'カモネギ';
+case 83:
+return 'ドードー';
+case 84:
+return 'ドードリオ';
+case 85:
+return 'パウワウ';
+case 86:
+return 'ジュゴン';
+case 87:
+return 'ベトベター';
+case 88:
+return 'ベトベトン';
+case 89:
+return 'シェルダー';
+case 90:
+return 'パルシェン';
+case 91:
+return 'ゴース';
+case 92:
+return 'ゴースト';
+case 93:
+return 'ゲンガー';
+case 94:
+return 'イワーク';
+case 95:
+return 'スリープ';
+case 96:
+return 'スリーパー';
+case 97:
+return 'クラブ';
+case 98:
+return 'キングラー';
+case 99:
+return 'ビリリダマ';
+case 100:
+return 'マルマイン';
+case 101:
+return 'タマタマ';
+case 102:
+return 'ナッシー';
+case 103:
+return 'カラカラ';
+case 104:
+return 'ガラガラ';
+case 105:
+return 'サワムラー';
+case 106:
+return 'エビワラー';
+case 107:
+return 'ベロリンガ';
+case 108:
+return 'ドガース';
+case 109:
+return 'マタドガス';
+case 110:
+return 'サイホーン';
+case 111:
+return 'サイドン';
+case 112:
+return 'ラッキー';
+case 113:
+return 'モンジャラ';
+case 114:
+return 'ガルーラ';
+case 115:
+return 'タッツー';
+case 116:
+return 'シードラ';
+case 117:
+return 'トサキント';
+case 118:
+return 'アズマオウ';
+case 119:
+return 'ヒトデマン';
+case 120:
+return 'スターミー';
+case 121:
+return 'バリヤード';
+case 122:
+return 'ストライク';
+case 123:
+return 'ルージュラ';
+case 124:
+return 'エレブー';
+case 125:
+return 'ブーバー';
+case 126:
+return 'カイロス';
+case 127:
+return 'ケンタロス';
+case 128:
+return 'コイキング';
+case 129:
+return 'ギャラドス';
+case 130:
+return 'ラプラス';
+case 131:
+return 'メタモン';
+case 132:
+return 'イーブイ';
+case 133:
+return 'シャワーズ';
+case 134:
+return 'サンダース';
+case 135:
+return 'ブースター';
+case 136:
+return 'ポリゴン';
+case 137:
+return 'オムナイト';
+case 138:
+return 'オムスター';
+case 139:
+return 'カブト';
+case 140:
+return 'カブトプス';
+case 141:
+return 'プテラ';
+case 142:
+return 'カビゴン';
+case 143:
+return 'フリーザー';
+case 144:
+return 'サンダー';
+case 145:
+return 'ファイヤー';
+case 146:
+return 'ミニリュウ';
+case 147:
+return 'ハクリュー';
+case 148:
+return 'カイリュー';
+case 149:
+return 'ミュウツー';
+case 150:
+return 'ミュウ';
+            }
+        }
+
+        // クイズをリセットする関数
+        function resetQuiz() {
+            randomIndex = Math.floor(Math.random() * pokemonImages.length);
+            pokemonName = getPokemonName(randomIndex);
+
+            pokemonImage.src = pokemonImages[randomIndex];
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').disabled = false;
+            document.getElementById('answer-button').disabled = false;
+            document.getElementById('answer-button').style.display = 'inline-block'; // 「回答する」を表示
+            document.getElementById('hint-button').style.display = 'inline-block'; // ヒントボタンを表示
+            document.getElementById('next-button').style.display = 'none'; // 「次の問題」を非表示
+            document.getElementById('result').textContent = '';
+        }
+    </script>
+</body>
+</html>
